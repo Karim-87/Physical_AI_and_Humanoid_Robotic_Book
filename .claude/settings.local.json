@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pip install pydantic-settings)",
+      "Bash(python -c \"from src.api.main import app; print(''Backend app loaded successfully'')\")",
+      "Bash(pip install sentence-transformers langchain)",
+      "Bash(pip install --user sentence-transformers langchain)",
+      "Bash(python -m uvicorn src.api.main:app --reload --host 127.0.0.1 --port 8000)",
+      "Bash(npm install prism-react-renderer)",
+      "Bash(dir \"D:\\AI Textbook Hackathon\\frontend\\docusaurus\\src\" /s)",
+      "Bash(npx docusaurus swizzle @docusaurus/theme-classic DocItem --typescript)",
+      "Bash(dir \"D:\\AI Textbook Hackathon\\frontend\\docusaurus\\i18n\\ur\\docusaurus-plugin-content-docs\" /s)",
+      "Bash(dir \"D:\\AI Textbook Hackathon\\frontend\\docusaurus\\i18n\\ur\\docusaurus-plugin-content-docs\\current\" /s)"
+    ]
+  }
+}

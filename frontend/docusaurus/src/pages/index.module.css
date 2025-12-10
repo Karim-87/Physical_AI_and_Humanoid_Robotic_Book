@@ -1,0 +1,96 @@
+/**
+ * CSS files with the .module.css suffix will be treated as CSS modules
+ * and scoped locally.
+ */
+
+.heroBanner {
+  padding: 4rem 0;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+@media screen and (max-width: 996px) {
+  .heroBanner {
+    padding: 2rem;
+  }
+}
+
+.buttons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.languageSelector {
+  margin-top: 1rem;
+}
+
+.tocSection {
+  margin-top: 2rem;
+  width: 100%;
+}
+
+.toc-title {
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+  font-weight: bold;
+  text-align: center;
+}
+
+.tocGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1rem;
+  width: 100%;
+}
+
+.tocItem {
+  text-align: left;
+  padding: 0.5rem 0;
+}
+
+.tocItem .button {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  padding: 1rem;
+  text-align: left;
+  transition: all 0.2s ease;
+}
+
+.tocItem .button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.tocNumber {
+  font-weight: bold;
+  color: #25c2a0;
+  margin-bottom: 0.25rem;
+  font-size: 0.9rem;
+}
+
+.tocText {
+  font-weight: 600;
+  font-size: 1rem;
+  margin-bottom: 0.25rem;
+}
+
+.tocDescription {
+  font-size: 0.85rem;
+  color: #6c757d;
+  margin: 0;
+  line-height: 1.4;
+}
+
+@media screen and (max-width: 996px) {
+  .tocGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .toc-title {
+    font-size: 1.25rem;
+  }
+}

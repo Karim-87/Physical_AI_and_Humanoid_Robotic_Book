@@ -1,0 +1,42 @@
+.textbook-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.toolbar-section {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.toolbar-section h4 {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #495057;
+}
+
+.inline-chatbot {
+  min-width: 300px;
+}
+
+@media (max-width: 768px) {
+  .textbook-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .toolbar-section {
+    justify-content: space-between;
+  }
+
+  .inline-chatbot {
+    width: 100%;
+  }
+}
