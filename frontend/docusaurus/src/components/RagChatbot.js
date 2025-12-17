@@ -1,13 +1,43 @@
 import React, { useState, useEffect } from 'react';
 import './RagChatbot.css';
 import ApiClient from './ApiClient';
+import { useAuth } from './AuthProvider';
 
-const RagChatbot = () => {
+const RagChatbot = ({ defaultLanguage = 'en' }) => {
   const [messages, setMessages] = useState([
     { id: 1, text: 'Hello! I\'m your AI assistant for the Physical AI & Humanoid Robotics textbook. How can I help you today?', sender: 'bot' }
   ]);
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [language, setLanguage] = useState(defaultLanguage);
+
+  // Get auth context to access user preferences
+  const { user, isAuthenticated } = useAuth();
+
+  // Update language based on user preferences when user changes
+  useEffect(() => {
+    const loadUserPreferences = async () => {
+      if (user && isAuthenticated) {
+        try {
+          const response = await fetch('/api/v1/auth/preferences', {
+            headers: {
+              'Authorization': `Bearer ${localStorage.getItem('textbook_token')}`,
+              'Content-Type': 'application/json',
+            },
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            setLanguage(data.language || defaultLanguage);
+          }
+        } catch (error) {
+          console.error('Error loading user preferences:', error);
+        }
+      }
+    };
+
+    loadUserPreferences();
+  }, [user, isAuthenticated, defaultLanguage]);
 
   const toggleChat = () => {
     // In the textbook context, we might want to close the chatbot differently
@@ -32,8 +62,8 @@ const RagChatbot = () => {
     setIsLoading(true);
 
     try {
-      // Call the backend API for RAG query
-      const response = await ApiClient.queryRag(inputText);
+      // Call the backend API for RAG query with user's language preference
+      const response = await ApiClient.queryRag(inputText, language);
 
       const botResponse = {
         id: Date.now() + 1,
@@ -103,6 +133,11 @@ const RagChatbot = () => {
             Send
           </button>
         </div>
+        {user && (
+          <div className="chatbot-footer">
+            <small>Current language: {language === 'en' ? 'English' : 'Urdu'}</small>
+          </div>
+        )}
       </div>
     </div>
   );

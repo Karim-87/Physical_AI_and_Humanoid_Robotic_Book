@@ -1,6 +1,8 @@
 // @ts-check
 // `@ts-check` enables ts-checking for the configuration file
 
+const { EnvironmentPlugin } = require('webpack');
+
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: 'Physical AI & Humanoid Robotics — Essentials',
@@ -120,6 +122,31 @@ const config = {
         darkTheme: require('prism-react-renderer').themes.dracula,
       },
     }),
+  themes: [
+    // Add custom theme components
+  ],
+  plugins: [
+    // Add client modules for global components
+    [
+      '@docusaurus/plugin-client-redirects',
+      {
+        fromExtensions: ['html'],
+      },
+    ],
+  ],
+  webpack: {
+    configure: {
+      plugins: [
+        new EnvironmentPlugin([
+          'REACT_APP_FACEBOOK_APP_ID',
+          'REACT_APP_GOOGLE_CLIENT_ID',
+          'REACT_APP_API_URL'
+        ])
+      ],
+    },
+  },
 };
+
+module.exports = config;
 
 module.exports = config;

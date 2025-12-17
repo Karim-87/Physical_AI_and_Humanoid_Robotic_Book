@@ -5,7 +5,7 @@ import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import Layout from '@theme/Layout';
 import styles from './index.module.css';
 import { useState, useEffect } from 'react';
-import RagChatbot from '../components/RagChatbot';
+import AuthenticatedRagChatbot from '../components/AuthenticatedRagChatbot';
 import LanguageSwitcher from '../components/LanguageSwitcher';
 
 function HomepageHeader() {
@@ -128,7 +128,7 @@ export default function Home() {
           </div>
         </div>
       </main>
-      <RagChatbot />
+      <AuthenticatedRagChatbot />
     </Layout>
   );
 }

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './TextbookToolbar.css';
 import LanguageSwitcher from './LanguageSwitcher';
-import RagChatbot from './RagChatbot';
+import AuthenticatedRagChatbot from './AuthenticatedRagChatbot';
 
 const TextbookToolbar = ({ content, chapterTitle }) => {
   const [currentLanguage, setCurrentLanguage] = useState('en');
@@ -24,7 +24,7 @@ const TextbookToolbar = ({ content, chapterTitle }) => {
       <div className="toolbar-section chatbot-tools">
         <h4>AI Assistant</h4>
         <div className="inline-chatbot">
-          <RagChatbot />
+          <AuthenticatedRagChatbot />
         </div>
       </div>
     </div>

@@ -84,6 +84,18 @@ class ApiClient {
       body: JSON.stringify(preferences),
     });
   }
+
+  // OAuth endpoints
+  async getOAuthUrl(provider) {
+    return this.request(`/oauth/${provider}/auth-url`);
+  }
+
+  async handleOAuthLogin(provider, code, redirectUri) {
+    return this.request(`/oauth/${provider}`, {
+      method: 'POST',
+      body: JSON.stringify({ code, provider, redirect_uri: redirectUri }),
+    });
+  }
 }
 
 export default new ApiClient();

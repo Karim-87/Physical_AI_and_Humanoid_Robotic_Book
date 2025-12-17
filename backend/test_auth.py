@@ -1,11 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from .textbook_routes import router as textbook_router
-from .rag_routes import router as rag_router
-from .auth_routes import router as auth_router
-from .oauth_routes import router as oauth_router
-from ..config.settings import settings
-
+from src.api.auth_routes import router as auth_router
+from src.api.oauth_routes import router as oauth_router
+from src.config.settings import settings
 
 app = FastAPI(title=settings.PROJECT_NAME, version="1.0.0")
 
@@ -18,22 +15,17 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Include routers
-app.include_router(textbook_router, prefix=settings.API_V1_STR, tags=["textbook"])
-app.include_router(rag_router, prefix=settings.API_V1_STR, tags=["rag"])
+# Include authentication routers only
 app.include_router(auth_router, prefix=settings.API_V1_STR, tags=["auth"])
 app.include_router(oauth_router, prefix=f"{settings.API_V1_STR}/oauth", tags=["oauth"])
 
-
 @app.get("/")
 def read_root():
-    return {"message": "Welcome to the Textbook RAG API"}
-
+    return {"message": "Welcome to the Authentication API"}
 
 @app.get("/health")
 def health_check():
-    return {"status": "healthy", "service": "textbook-rag-api"}
-
+    return {"status": "healthy", "service": "auth-api"}
 
 @app.get("/auth-info")
 def auth_info():
@@ -69,3 +61,7 @@ def auth_info():
             "alternative_step_4": "Or let the callback endpoint handle the redirect automatically"
         }
     }
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="127.0.0.1", port=8000)

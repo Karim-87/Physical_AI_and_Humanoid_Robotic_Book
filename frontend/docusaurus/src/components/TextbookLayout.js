@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '@theme/Layout';
 import TextbookTranslator from './TextbookTranslator';
-import RagChatbot from './RagChatbot';
+import AuthenticatedRagChatbot from './AuthenticatedRagChatbot';
 
 const TextbookLayout = ({ children, title, description, currentContent }) => {
   const [translatedContent, setTranslatedContent] = useState(null);
@@ -32,7 +32,7 @@ const TextbookLayout = ({ children, title, description, currentContent }) => {
           {processedChildren}
         </main>
         <div className="textbook-footer">
-          <RagChatbot />
+          <AuthenticatedRagChatbot />
         </div>
       </div>
     </Layout>

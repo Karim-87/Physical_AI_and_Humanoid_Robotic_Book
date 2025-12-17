@@ -14,21 +14,36 @@ class EmbeddingService:
             url=settings.QDRANT_URL,
             api_key=settings.QDRANT_API_KEY
         )
-        self.collection_name = "textbook_embeddings"
-        self._initialize_collection()
+        # Use configured collection names from settings
+        self.collection_name_en = settings.QDRANT_COLLECTION_EN
+        self.collection_name_ur = settings.QDRANT_COLLECTION_UR
+        self.default_collection = self.collection_name_en
+        self._initialize_collections()
+
+    def _get_collection_name(self, language: str = None) -> str:
+        """Get the appropriate collection name based on language."""
+        if language == "ur":
+            return self.collection_name_ur
+        else:
+            return self.collection_name_en
+
+    def _initialize_collections(self):
+        """Initialize both English and Urdu Qdrant collections for storing embeddings."""
+        for collection_name in [self.collection_name_en, self.collection_name_ur]:
+            try:
+                # Check if collection exists
+                self.client.get_collection(collection_name)
+            except:
+                # Create collection if it doesn't exist
+                self.client.create_collection(
+                    collection_name=collection_name,
+                    vectors_config=models.VectorParams(size=384, distance=models.Distance.COSINE),
+                )
+                logging.info(f"Created Qdrant collection: {collection_name}")
 
     def _initialize_collection(self):
-        """Initialize the Qdrant collection for storing embeddings."""
-        try:
-            # Check if collection exists
-            self.client.get_collection(self.collection_name)
-        except:
-            # Create collection if it doesn't exist
-            self.client.create_collection(
-                collection_name=self.collection_name,
-                vectors_config=models.VectorParams(size=384, distance=models.Distance.COSINE),
-            )
-            logging.info(f"Created Qdrant collection: {self.collection_name}")
+        """Deprecated: Use _initialize_collections instead."""
+        self._initialize_collections()
 
     def create_embedding(self, text: str) -> List[float]:
         """Create an embedding for the given text."""
@@ -39,9 +54,10 @@ class EmbeddingService:
         """Store an embedding in Qdrant and return the ID."""
         embedding = self.create_embedding(content)
         point_id = str(uuid.uuid4())
+        collection_name = self._get_collection_name(language)
 
         self.client.upsert(
-            collection_name=self.collection_name,
+            collection_name=collection_name,
             points=[
                 models.PointStruct(
                     id=point_id,
@@ -62,7 +78,10 @@ class EmbeddingService:
         """Search for similar content based on the query."""
         query_embedding = self.create_embedding(query)
 
-        # Prepare search filter based on language
+        # Determine which collection to search based on language
+        collection_name = self._get_collection_name(language)
+
+        # Prepare search filter based on language (for consistency, though collection name already specifies language)
         search_filter = None
         if language:
             search_filter = models.Filter(
@@ -75,7 +94,7 @@ class EmbeddingService:
             )
 
         search_results = self.client.search(
-            collection_name=self.collection_name,
+            collection_name=collection_name,
             query_vector=query_embedding,
             limit=limit,
             query_filter=search_filter
@@ -117,8 +136,9 @@ class EmbeddingService:
                 )
             )
 
+        collection_name = self._get_collection_name(language)
         self.client.upsert(
-            collection_name=self.collection_name,
+            collection_name=collection_name,
             points=points
         )
 

@@ -3,6 +3,9 @@ uvicorn[standard]==0.24.0
 pydantic==2.5.0
 qdrant-client==1.8.0
 langchain==0.0.352
+langchain-google-genai==0.0.9
+langchain-openai==0.0.8
+google-generativeai==0.3.1
 python-multipart==0.0.6
 passlib[bcrypt]==1.7.4
 python-jose[cryptography]==3.3.0

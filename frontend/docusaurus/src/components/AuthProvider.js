@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import OAuthService from './OAuthService';
 
 const AuthContext = createContext();
 
@@ -14,24 +15,49 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Check for existing session on component mount
+  // Check for OAuth callback and handle it
   useEffect(() => {
-    const token = localStorage.getItem('textbook_token');
-    const userData = localStorage.getItem('textbook_user');
+    const handleOAuthCallback = async () => {
+      const oauthData = OAuthService.checkOAuthCallback();
 
-    if (token && userData) {
-      try {
-        const parsedUser = JSON.parse(userData);
-        setUser({ ...parsedUser, token });
-      } catch (error) {
-        console.error('Error parsing user data:', error);
-        // Clear invalid data
-        localStorage.removeItem('textbook_token');
-        localStorage.removeItem('textbook_user');
+      if (oauthData) {
+        try {
+          const result = await OAuthService.handleOAuthCallback(
+            oauthData.provider,
+            oauthData.code,
+            oauthData.state
+          );
+
+          if (result.success) {
+            setUser(result.user);
+          }
+        } catch (error) {
+          console.error('OAuth callback error:', error);
+          // Could optionally show an error message to the user
+        }
+        return; // Exit early if we're handling an OAuth callback
       }
-    }
 
-    setLoading(false);
+      // Check for existing session on component mount
+      const token = localStorage.getItem('textbook_token');
+      const userData = localStorage.getItem('textbook_user');
+
+      if (token && userData) {
+        try {
+          const parsedUser = JSON.parse(userData);
+          setUser({ ...parsedUser, token });
+        } catch (error) {
+          console.error('Error parsing user data:', error);
+          // Clear invalid data
+          localStorage.removeItem('textbook_token');
+          localStorage.removeItem('textbook_user');
+        }
+      }
+
+      setLoading(false);
+    };
+
+    handleOAuthCallback();
   }, []);
 
   const login = async (username, password) => {
@@ -97,11 +123,33 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
+  const initiateFacebookLogin = async () => {
+    try {
+      await OAuthService.initiateFacebookLogin();
+      return { success: true };
+    } catch (error) {
+      console.error('Facebook login error:', error);
+      return { success: false, error: error.message || 'Facebook login failed' };
+    }
+  };
+
+  const initiateGoogleLogin = async () => {
+    try {
+      await OAuthService.initiateGoogleLogin();
+      return { success: true };
+    } catch (error) {
+      console.error('Google login error:', error);
+      return { success: false, error: error.message || 'Google login failed' };
+    }
+  };
+
   const value = {
     user,
     login,
     register,
     logout,
+    initiateFacebookLogin,
+    initiateGoogleLogin,
     isAuthenticated: !!user,
     loading
   };

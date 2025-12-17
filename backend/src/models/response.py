@@ -14,3 +14,4 @@ class ChatResponse(Base):
     source_chapters = Column(ARRAY(String))  # IDs of chapters used for response
     confidence_score = Column(Float)  # Confidence level of response
     timestamp = Column(DateTime, default=datetime.utcnow)  # When response was generated
+    language = Column(String, default="en")  # Language of the response

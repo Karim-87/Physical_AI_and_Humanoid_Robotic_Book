@@ -1,0 +1,422 @@
+openapi: 3.0.0
+info:
+  title: Textbook Authentication API
+  description: API for user authentication, authorization, and personalization
+  version: 1.0.0
+servers:
+  - url: http://localhost:8000/api/v1
+    description: Development server
+
+paths:
+  /auth/register:
+    post:
+      summary: Register a new user
+      description: Create a new user account with username, email, and password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - username
+                - email
+                - password
+              properties:
+                username:
+                  type: string
+                  minLength: 3
+                  maxLength: 50
+                  description: Unique username
+                email:
+                  type: string
+                  format: email
+                  description: User's email address
+                password:
+                  type: string
+                  minLength: 8
+                  description: User's password
+      responses:
+        '200':
+          description: Registration successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    description: JWT access token
+                  user_id:
+                    type: string
+                    description: Unique user identifier
+                  username:
+                    type: string
+                    description: User's username
+                  message:
+                    type: string
+                    description: Success message
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+        '409':
+          description: Username or email already exists
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+
+  /auth/login:
+    post:
+      summary: Login user
+      description: Authenticate user with username/email and password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - username
+                - password
+              properties:
+                username:
+                  type: string
+                  description: Username or email
+                password:
+                  type: string
+                  description: User's password
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    description: JWT access token
+                  user_id:
+                    type: string
+                    description: Unique user identifier
+                  username:
+                    type: string
+                    description: User's username
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+
+  /auth/facebook:
+    post:
+      summary: Facebook OAuth login
+      description: Authenticate user via Facebook OAuth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - code
+              properties:
+                code:
+                  type: string
+                  description: OAuth authorization code from Facebook
+                redirect_uri:
+                  type: string
+                  description: Redirect URI used in OAuth flow
+      responses:
+        '200':
+          description: OAuth login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    description: JWT access token
+                  user_id:
+                    type: string
+                    description: Unique user identifier
+                  username:
+                    type: string
+                    description: User's username
+                  is_new_user:
+                    type: boolean
+                    description: Whether this is a new user account
+        '401':
+          description: Invalid OAuth code
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+
+  /auth/google:
+    post:
+      summary: Google OAuth login
+      description: Authenticate user via Google OAuth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - code
+              properties:
+                code:
+                  type: string
+                  description: OAuth authorization code from Google
+                redirect_uri:
+                  type: string
+                  description: Redirect URI used in OAuth flow
+      responses:
+        '200':
+          description: OAuth login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    description: JWT access token
+                  user_id:
+                    type: string
+                    description: Unique user identifier
+                  username:
+                    type: string
+                    description: User's username
+                  is_new_user:
+                    type: boolean
+                    description: Whether this is a new user account
+        '401':
+          description: Invalid OAuth code
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+
+  /auth/me:
+    get:
+      summary: Get current user info
+      description: Retrieve information about the currently authenticated user
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: User information retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user_id:
+                    type: string
+                    description: Unique user identifier
+                  username:
+                    type: string
+                    description: User's username
+                  email:
+                    type: string
+                    format: email
+                    description: User's email address
+                  preferences:
+                    type: object
+                    description: User preferences
+                  language_preference:
+                    type: string
+                    description: User's preferred language
+                  personalization_enabled:
+                    type: boolean
+                    description: Whether personalization is enabled
+        '401':
+          description: Invalid or expired token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+
+  /user/preferences:
+    get:
+      summary: Get user preferences
+      description: Retrieve current user's preferences
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Preferences retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  preferences:
+                    type: object
+                    description: User preferences
+                  language:
+                    type: string
+                    description: User's preferred language
+                  personalization_enabled:
+                    type: boolean
+                    description: Whether personalization is enabled
+        '401':
+          description: Invalid or expired token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+    put:
+      summary: Update user preferences
+      description: Update current user's preferences
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                preferences:
+                  type: object
+                  description: User preferences to update
+                language:
+                  type: string
+                  description: Preferred language
+                personalization_enabled:
+                  type: boolean
+                  description: Whether to enable personalization
+      responses:
+        '200':
+          description: Preferences updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+        '401':
+          description: Invalid or expired token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+
+  /rag/chat:
+    post:
+      summary: Chat with RAG system
+      description: Send a query to the RAG system and get a response based on textbook content
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - query
+              properties:
+                query:
+                  type: string
+                  description: User's question
+                selected_text:
+                  type: string
+                  description: Optional selected text for context
+                language:
+                  type: string
+                  enum: [en, ur]
+                  description: Language for the response
+      responses:
+        '200':
+          description: Query processed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  response:
+                    type: string
+                    description: AI-generated response
+                  sources:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        chapter_id:
+                          type: string
+                        content_snippet:
+                          type: string
+                    description: Sources used for the response
+                  confidence:
+                    type: number
+                    format: float
+                    description: Confidence score of the response
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  detail:
+                    type: string
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

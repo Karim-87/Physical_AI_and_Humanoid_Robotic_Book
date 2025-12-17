@@ -15,9 +15,11 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 class AuthService:
     def __init__(self):
-        self.secret_key = settings.SECRET_KEY
+        # Use JWT_SECRET if available, otherwise fall back to SECRET_KEY
+        self.secret_key = settings.JWT_SECRET or settings.SECRET_KEY
         self.algorithm = settings.ALGORITHM
-        self.access_token_expire_minutes = settings.ACCESS_TOKEN_EXPIRE_MINUTES
+        # Use JWT_EXPIRE_MINUTES if available, otherwise fall back to ACCESS_TOKEN_EXPIRE_MINUTES
+        self.access_token_expire_minutes = settings.JWT_EXPIRE_MINUTES or settings.ACCESS_TOKEN_EXPIRE_MINUTES
 
     def verify_password(self, plain_password: str, hashed_password: str) -> bool:
         """Verify a plain password against a hashed password."""
