@@ -5,6 +5,13 @@ from typing import Optional, List, Dict, Any
 from contextlib import asynccontextmanager
 import logging
 import datetime
+import os
+import sys
+
+# Add backend directory to the path for imports
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(__file__)), 'backend'))
+
+# Import backend services - adjust import paths for Vercel
 from src.services.agent import rag_agent
 from src.services.session import session_service
 from src.config.qdrant_config import qdrant_service
