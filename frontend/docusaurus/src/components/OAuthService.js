@@ -1,22 +1,11 @@
 // OAuthService.js - Handles OAuth flows for Facebook and Google
 class OAuthService {
   constructor() {
-    // Access environment variables safely for browser environment
-    // In Docusaurus, environment variables can be passed via config
-    this.facebookClientId = this.getEnvVar('REACT_APP_FACEBOOK_APP_ID');
-    this.googleClientId = this.getEnvVar('REACT_APP_GOOGLE_CLIENT_ID');
-    this.backendUrl = this.getEnvVar('REACT_APP_API_URL') || 'http://127.0.0.1:8000/api/v1';
-  }
-
-  // Helper method to safely get environment variables in browser
-  getEnvVar(varName) {
-    // Check for variables in window object (set by Docusaurus config)
-    if (typeof window !== 'undefined' && window[varName]) {
-      return window[varName];
-    }
-    // For Node.js environment (build time), we'll use a different approach
-    // since process is not available in browser runtime
-    return null;
+    // Access environment variables from window object
+    // These should be defined in .env file and exposed via Docusaurus config
+    this.facebookClientId = typeof window !== 'undefined' ? window.REACT_APP_FACEBOOK_APP_ID : null;
+    this.googleClientId = typeof window !== 'undefined' ? window.REACT_APP_GOOGLE_CLIENT_ID : null;
+    this.backendUrl = (typeof window !== 'undefined' ? window.REACT_APP_API_URL : null) || 'http://127.0.0.1:8000/api/v1';
   }
 
   // Facebook OAuth

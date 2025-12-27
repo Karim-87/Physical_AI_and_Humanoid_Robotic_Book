@@ -1,0 +1,19 @@
+version = 1
+revision = 2
+requires-python = ">=3.12"
+
+[manifest]
+members = [
+    "ai-textbook-hackathon",
+    "backend",
+]
+
+[[package]]
+name = "ai-textbook-hackathon"
+version = "0.1.0"
+source = { virtual = "." }
+
+[[package]]
+name = "backend"
+version = "0.1.0"
+source = { virtual = "backend" }

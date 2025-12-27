@@ -1,71 +1,47 @@
 from pydantic_settings import BaseSettings
 from typing import Optional
+import os
+from dotenv import load_dotenv
 
+# Load environment variables from .env file
+load_dotenv()
 
 class Settings(BaseSettings):
-    # Application settings
-    APP_ENV: str = "development"
-    APP_NAME: str = "physical-ai-textbook"
-    APP_BASE_URL: str = "http://localhost:8000"
+    # API Keys
+    gemini_api_key: str = os.getenv("GEMINI_API_KEY", "")
+    cohere_api_key: str = os.getenv("COHERE_API_KEY", "")
+    qdrant_api_key: str = os.getenv("QDRANT_API_KEY", "")
+    qdrant_url: str = os.getenv("QDRANT_URL", "")
+    neon_database_url: str = os.getenv("NEON_DATABASE_URL", "")
 
-    # Database settings
-    DATABASE_URL: str = "sqlite:///./textbook.db"  # Use SQLite as default for local development
-    NEON_DATABASE_URL: Optional[str] = None
+    # Application settings
+    app_name: str = "Physical AI and Humanoid Robotics RAG Chatbot"
+    app_version: str = "1.0.0"
+    debug: bool = os.getenv("DEBUG", "False").lower() == "true"
 
     # Qdrant settings
-    QDRANT_URL: str = "http://localhost:6333"
-    QDRANT_API_KEY: Optional[str] = None
-    QDRANT_COLLECTION_EN: str = "book_embeddings_en"
-    QDRANT_COLLECTION_UR: str = "book_embeddings_ur"
+    qdrant_collection_name: str = "textbook_content"
 
-    # Security settings
-    SECRET_KEY: str = "your-secret-key-here"
-    ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 1440  # 24 hours
+    # Model settings
+    embedding_model: str = "embed-english-v3.0"
+    gemini_model: str = "gemini-2.0-flash"
 
-    # JWT settings (mapped from .env.example)
-    JWT_SECRET: Optional[str] = None
-    JWT_EXPIRE_MINUTES: int = 1440
+    # Text processing
+    chunk_size: int = 800
+    chunk_overlap: int = 200
 
-    # Rate limiting settings
-    RATE_LIMIT_REQUESTS: int = 60  # requests per window
-    RATE_LIMIT_WINDOW: int = 3600  # window in seconds (1 hour)
+    # URLs and Collection
+    sitemap_url: str = os.getenv("SITEMAP_URL", "https://physical-ai-and-humanoid-robotic-bo-three.vercel.app/sitemap.xml")
+    collection_name: str = os.getenv("COLLECTION_NAME", "textbook_content")
 
-    # API settings
-    API_V1_STR: str = "/api/v1"
-    PROJECT_NAME: str = "Physical AI & Humanoid Robotics Textbook API"
-
-    # RAG settings
-    EMBEDDING_MODEL: str = "sentence-transformers/all-MiniLM-L6-v2"
-
-    # LLM Provider settings
-    LLM_PROVIDER: str = "gemini"
-    GEMINI_API_KEY: Optional[str] = None
-    OPENAI_API_KEY: Optional[str] = None
-
-    # OAuth Provider settings
-    FACEBOOK_CLIENT_ID: Optional[str] = None
-    FACEBOOK_CLIENT_SECRET: Optional[str] = None
-    FACEBOOK_REDIRECT_URI: str = "http://localhost:3000/auth/facebook/callback"
-
-    GOOGLE_CLIENT_ID: Optional[str] = None
-    GOOGLE_CLIENT_SECRET: Optional[str] = None
-    GOOGLE_REDIRECT_URI: str = "http://localhost:3000/auth/google/callback"
-
-    # Frontend settings
-    FRONTEND_OAUTH_CALLBACK_URL: str = "http://localhost:3000"
-
-    # RAG Constraints
-    RAG_MODE: str = "book_only"
-    RAG_ALLOW_SELECTED_TEXT_ONLY: bool = True
-    MAX_CONTEXT_CHUNKS: int = 4
-
-    # Language Settings
-    DEFAULT_LANGUAGE: str = "en"
-    SUPPORTED_LANGUAGES: str = "en,ur"
+    # Additional settings from .env
+    jwt_secret_key: str = os.getenv("JWT_SECRET_KEY", "")
+    jwt_algorithm: str = os.getenv("JWT_ALGORITHM", "HS256")
+    access_token_expire_minutes: int = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "30"))
+    embed_model: str = os.getenv("EMBED_MODEL", "embed-english-v3.0")
 
     class Config:
         env_file = ".env"
-
+        extra = "ignore"  # Ignore extra fields in .env that are not defined in the model
 
 settings = Settings()

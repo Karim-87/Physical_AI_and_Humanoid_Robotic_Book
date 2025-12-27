@@ -208,3 +208,14 @@ Wait for consent; never auto-create ADRs. Group related decisions (stacks, authe
 
 ## Code Standards
 See `.specify/memory/constitution.md` for code quality, testing, performance, security, and architecture principles.
+
+## Active Technologies
+- Python 3.12 + FastAPI, Cohere, Qdrant Client, Neon Postgres, Pydantic, JWT (003-backend-rag-auth)
+- Neon Postgres (authentication), Qdrant Cloud (vector embeddings) (003-backend-rag-auth)
+- Python 3.12 + FastAPI, OpenAI Agents SDK, Cohere, Qdrant Client, Neon Postgres, uv (005-backend-rag-chatbot)
+- Qdrant Cloud (vector store), Neon Serverless Postgres (relational), Local files (ingestion pipeline) (005-backend-rag-chatbot)
+- JavaScript (ECMAScript 2020+), Python 3.12 + Docusaurus v3.x, React 18+, FastAPI 0.104+, Node.js 18+ (001-frontend-backend-integration)
+- Qdrant Cloud (vector store), Neon Serverless Postgres (relational), Local files (frontend) (001-frontend-backend-integration)
+
+## Recent Changes
+- 003-backend-rag-auth: Added Python 3.12 + FastAPI, Cohere, Qdrant Client, Neon Postgres, Pydantic, JWT
