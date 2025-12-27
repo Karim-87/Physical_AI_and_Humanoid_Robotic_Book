@@ -5,7 +5,6 @@ cohere>=5.5.0
 qdrant-client>=1.9.0
 pydantic>=2.5.0
 pydantic-settings>=2.1.0
-neon-pg>=0.0.9
 python-jose[cryptography]>=3.3.0
 passlib[bcrypt]>=1.7.4
 python-multipart>=0.0.6
