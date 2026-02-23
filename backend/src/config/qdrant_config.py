@@ -17,18 +17,21 @@ class QdrantService:
         try:
             # Initialize the Qdrant client
             if settings.qdrant_url.startswith("http"):
-                # Cloud instance
+                # Cloud instance — use url param with explicit port 6333
+                qdrant_url = settings.qdrant_url.rstrip("/")
+                if ":6333" not in qdrant_url:
+                    qdrant_url = f"{qdrant_url}:6333"
                 self.client = QdrantClient(
-                    url=settings.qdrant_url,
+                    url=qdrant_url,
                     api_key=settings.qdrant_api_key,
-                    timeout=10
+                    timeout=10,
                 )
             else:
                 # Local instance
                 self.client = QdrantClient(
                     host=settings.qdrant_url,
                     api_key=settings.qdrant_api_key,
-                    timeout=10
+                    timeout=10,
                 )
 
             # Use collection name from settings
@@ -42,16 +45,17 @@ class QdrantService:
                 collection_exists = False
 
             if not collection_exists:
-                await self.create_collection()
+                self.create_collection()
                 logger.info(f"Created Qdrant collection: {self.collection_name}")
             else:
                 logger.info(f"Qdrant collection {self.collection_name} already exists")
 
         except Exception as e:
             logger.error(f"Failed to initialize Qdrant client: {e}")
-            raise
+            logger.warning("Qdrant is unavailable — the app will start but RAG queries may fail.")
+            # Don't raise — allow the app to start without Qdrant
 
-    async def create_collection(self):
+    def create_collection(self):
         """Create the collection for storing textbook content embeddings"""
         if not self.client:
             raise RuntimeError("Qdrant client not initialized")
@@ -69,7 +73,6 @@ class QdrantService:
         try:
             if not self.client:
                 return False
-            # Try to get collection info as a simple test
             collection_info = self.client.get_collection(self.collection_name)
             return True
         except Exception:
