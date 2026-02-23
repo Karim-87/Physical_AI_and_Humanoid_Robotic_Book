@@ -38,19 +38,31 @@ async def lifespan(app: FastAPI):
     """Initialize services on startup"""
     logger.info("Initializing services...")
 
-    # Initialize Qdrant
-    await qdrant_service.initialize()
+    # Initialize Qdrant (non-fatal if unavailable)
+    try:
+        await qdrant_service.initialize()
+    except Exception as e:
+        logger.error(f"Qdrant initialization failed: {e}")
 
     # Initialize Cohere
-    cohere_service.initialize()
+    try:
+        cohere_service.initialize()
+    except Exception as e:
+        logger.error(f"Cohere initialization failed: {e}")
 
     # Initialize Gemini
-    gemini_service.initialize()
+    try:
+        gemini_service.initialize()
+    except Exception as e:
+        logger.error(f"Gemini initialization failed: {e}")
 
     # Initialize database
-    await init_db()
+    try:
+        await init_db()
+    except Exception as e:
+        logger.error(f"Database initialization failed: {e}")
 
-    logger.info("All services initialized successfully!")
+    logger.info("Service initialization complete!")
     yield
     logger.info("Shutting down...")
 

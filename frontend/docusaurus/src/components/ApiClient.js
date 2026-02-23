@@ -39,17 +39,30 @@ class ApiClient {
 
   // RAG endpoints
   async queryRag(query, language = 'en', context = null) {
-    return this.request('/rag/query', {
+    const result = await this.request('/chat', {
       method: 'POST',
-      body: JSON.stringify({ query, language, context }),
+      body: JSON.stringify({ message: query, selected_text: context }),
     });
+    // Map backend response to frontend expected format
+    return {
+      answer: result.response,
+      sources: [],
+      session_id: result.session_id,
+      mode: result.mode,
+    };
   }
 
   async queryBySelection(selectedText, question = null) {
-    return this.request('/rag/query-by-selection', {
+    const result = await this.request('/chat', {
       method: 'POST',
-      body: JSON.stringify({ selected_text: selectedText, question }),
+      body: JSON.stringify({ message: question || 'Explain this text', selected_text: selectedText }),
     });
+    return {
+      answer: result.response,
+      sources: [],
+      session_id: result.session_id,
+      mode: result.mode,
+    };
   }
 
   // Authentication endpoints

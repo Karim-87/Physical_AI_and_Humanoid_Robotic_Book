@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './RagChatbot.css';
 import ApiClient from './ApiClient';
 import { useAuth } from './AuthProvider';
@@ -10,6 +10,8 @@ const RagChatbot = ({ defaultLanguage = 'en' }) => {
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [language, setLanguage] = useState(defaultLanguage);
+  const [isOpen, setIsOpen] = useState(false);
+  const messagesEndRef = useRef(null);
 
   // Get auth context to access user preferences
   const { user, isAuthenticated } = useAuth();
@@ -39,12 +41,15 @@ const RagChatbot = ({ defaultLanguage = 'en' }) => {
     loadUserPreferences();
   }, [user, isAuthenticated, defaultLanguage]);
 
+  // Auto-scroll to bottom when new messages arrive
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages, isLoading]);
+
   const toggleChat = () => {
-    // In the textbook context, we might want to close the chatbot differently
-    // For now, we'll just clear the messages to "close" it conceptually
-    setMessages([
-      { id: 1, text: 'Hello! I\'m your AI assistant for the Physical AI & Humanoid Robotics textbook. How can I help you today?', sender: 'bot' }
-    ]);
+    setIsOpen(prev => !prev);
   };
 
   const sendMessage = async () => {
@@ -94,51 +99,68 @@ const RagChatbot = ({ defaultLanguage = 'en' }) => {
 
   return (
     <div className="rag-chatbot">
-      <div className="rag-chatbot-window textbook-chatbot">
-        <div className="rag-chatbot-header">
-          <span>Textbook AI Assistant</span>
-          <button className="chatbot-close-button" onClick={toggleChat}>
-            ×
-          </button>
-        </div>
-        <div className="rag-chatbot-messages">
-          {messages.map((message) => (
-            <div
-              key={message.id}
-              className={`message ${message.sender}-message`}
-            >
-              {message.text}
-              {message.sources && message.sources.length > 0 && (
-                <div className="message-sources">
-                  <small>Sources: {message.sources.join(', ')}</small>
-                </div>
-              )}
-            </div>
-          ))}
-          {isLoading && (
-            <div className="message bot-message">
-              Thinking...
+      {/* Floating toggle button */}
+      <button
+        className={`chatbot-toggle-button ${isOpen ? 'chatbot-toggle-open' : ''}`}
+        onClick={toggleChat}
+        aria-label={isOpen ? 'Close chatbot' : 'Open chatbot'}
+      >
+        {isOpen ? '×' : '💬'}
+      </button>
+
+      {/* Chat window */}
+      {isOpen && (
+        <div className="rag-chatbot-window">
+          <div className="rag-chatbot-header">
+            <span>Textbook AI Assistant</span>
+            <button className="chatbot-close-button" onClick={toggleChat} aria-label="Close chatbot">
+              ×
+            </button>
+          </div>
+          <div className="rag-chatbot-messages">
+            {messages.map((message) => (
+              <div
+                key={message.id}
+                className={`message ${message.sender}-message`}
+              >
+                {message.text}
+                {message.sources && message.sources.length > 0 && (
+                  <div className="message-sources">
+                    <small>Sources: {message.sources.join(', ')}</small>
+                  </div>
+                )}
+              </div>
+            ))}
+            {isLoading && (
+              <div className="message bot-message typing-indicator-message">
+                <span className="typing-dot"></span>
+                <span className="typing-dot"></span>
+                <span className="typing-dot"></span>
+              </div>
+            )}
+            <div ref={messagesEndRef} />
+          </div>
+          <div className="rag-chatbot-input">
+            <textarea
+              value={inputText}
+              onChange={(e) => setInputText(e.target.value)}
+              onKeyDown={handleKeyPress}
+              placeholder="Ask about the textbook content..."
+              rows="2"
+              maxLength={5000}
+              aria-label="Type your question"
+            />
+            <button onClick={sendMessage} disabled={isLoading} aria-label="Send message">
+              Send
+            </button>
+          </div>
+          {user && (
+            <div className="chatbot-footer">
+              <small>Current language: {language === 'en' ? 'English' : 'Urdu'}</small>
             </div>
           )}
         </div>
-        <div className="rag-chatbot-input">
-          <textarea
-            value={inputText}
-            onChange={(e) => setInputText(e.target.value)}
-            onKeyPress={handleKeyPress}
-            placeholder="Ask about the textbook content..."
-            rows="2"
-          />
-          <button onClick={sendMessage} disabled={isLoading}>
-            Send
-          </button>
-        </div>
-        {user && (
-          <div className="chatbot-footer">
-            <small>Current language: {language === 'en' ? 'English' : 'Urdu'}</small>
-          </div>
-        )}
-      </div>
+      )}
     </div>
   );
 };

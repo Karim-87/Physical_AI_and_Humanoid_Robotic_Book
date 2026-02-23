@@ -98,6 +98,8 @@ class RAGAgent:
             )
 
             # Extract the response
+            if not response.choices or not response.choices[0].message.content:
+                raise ValueError("No response content from Gemini API")
             llm_response = response.choices[0].message.content
 
             # Calculate response time

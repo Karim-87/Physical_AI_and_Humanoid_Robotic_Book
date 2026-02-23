@@ -1,3 +1,4 @@
+import asyncio
 import cohere
 from typing import List
 import logging
@@ -37,7 +38,8 @@ class CohereService:
 
     async def embed_text_async(self, texts: List[str]) -> List[List[float]]:
         """Generate embeddings for a list of texts (async version)"""
-        return self.embed_text(texts)
+        loop = asyncio.get_event_loop()
+        return await loop.run_in_executor(None, self.embed_text, texts)
 
 # Global instance
 cohere_service = CohereService()

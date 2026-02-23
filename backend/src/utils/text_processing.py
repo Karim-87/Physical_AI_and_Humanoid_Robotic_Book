@@ -1,20 +1,15 @@
 import re
 from typing import List, Tuple
 from bs4 import BeautifulSoup
-import tiktoken
 from src.config.settings import settings
 
 def count_tokens(text: str, model_name: str = "gpt-4") -> int:
     """
-    Count the number of tokens in a text using tiktoken.
+    Estimate the number of tokens in a text.
+    Uses a word-based approximation (~1.3 tokens per word).
     """
-    try:
-        encoding = tiktoken.encoding_for_model(model_name)
-    except KeyError:
-        # Fallback to cl100k_base encoding which is used by gpt-4
-        encoding = tiktoken.get_encoding("cl100k_base")
-
-    return len(encoding.encode(text))
+    words = text.split()
+    return int(len(words) * 1.3)
 
 def chunk_text(text: str, chunk_size: int = 800, overlap: int = 200) -> List[str]:
     """
@@ -92,17 +87,13 @@ def chunk_text(text: str, chunk_size: int = 800, overlap: int = 200) -> List[str
 def get_token_subset(text: str, token_count: int) -> str:
     """
     Get a subset of text containing approximately token_count tokens.
+    Uses word-based approximation.
     """
-    encoding = tiktoken.get_encoding("cl100k_base")
-    tokens = encoding.encode(text)
-
-    # Take the first token_count tokens
-    subset_tokens = tokens[:token_count]
-
-    # Decode back to text
-    subset_text = encoding.decode(subset_tokens)
-
-    return subset_text
+    words = text.split()
+    # Approximate: ~1.3 tokens per word, so word_count ~ token_count / 1.3
+    word_count = max(1, int(token_count / 1.3))
+    subset_words = words[:word_count]
+    return " ".join(subset_words)
 
 def split_long_text(text: str, chunk_size: int, overlap: int) -> List[str]:
     """
